@@ -1,0 +1,63 @@
+
+
+3-2.1 Скачать архив Geolocation github zip или Geolocation data из Cloudera.
+
+Создать каталог ex_3_2:
+
+[cloudera@quickstart ~]$ mkdir ex_3_2
+[cloudera@quickstart ~]$ ls
+201402_babs_open_data      cloudera-manager  eclipse                     kerberos      __MACOSX  Templates
+201408_babs_open_data      cm_api.py         enterprise-deployment.json  petrov      Music     trucks.csv
+3.1.12__petrov_SV.txt    Desktop           ex_3_2                      petrov.gz   parcels   Videos
+athlete.snappy.parquet     Documents         express-deployment.json     petrov.txt  Pictures  workspace
+babs_open_data_year_1.zip  Downloads         JrboaizPXSh0Mg              lib           Public
+
+Пререйти в каталог ex_3_2:+
+Скачать данные Geolocation data:+
+разархивировать данные+
+(C разрешения преопдавателя сразу загружены файлы geolocation и trucks)
+[cloudera@quickstart ex_3_2]$ wget https://github.com/BosenkoTM/cloudera-quickstart/blob/main/data/geolocation.csv
+--2024-04-06 03:47:18--  https://github.com/BosenkoTM/cloudera-quickstart/blob/main/data/geolocation.csv
+Resolving github.com... 140.82.121.4
+Connecting to github.com|140.82.121.4|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: “geolocation.csv”
+
+    [   <=>                                 ] 842,734     1.41M/s   in 0.6s    
+
+2024-04-06 03:47:20 (1.41 MB/s) - “geolocation.csv” saved [842734]
+
+[cloudera@quickstart ex_3_2]$ wget https://github.com/BosenkoTM/cloudera-quickstart/blob/main/data/trucks.csv
+--2024-04-06 03:47:38--  https://github.com/BosenkoTM/cloudera-quickstart/blob/main/data/trucks.csv
+Resolving github.com... 140.82.121.4
+Connecting to github.com|140.82.121.4|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: “trucks.csv”
+
+    [  <=>                                  ] 231,905     1.00M/s   in 0.2s    
+
+2024-04-06 03:47:39 (1.00 MB/s) - “trucks.csv” saved [231905]
+
+[cloudera@quickstart ex_3_2]$ ls
+geolocation.csv  geolocation.zip  trucks.csv
+
+3-2.2 В Hue, выбрать Browsers > Files.
+Создайте новый каталог в HDFS с именем geoloc внутри HDFS из Hue. По умолчанию это должно быть создано под hdfs:///user/cloudera/.+
+Загрузите Geolocation.csv и trucks.csv в только что созданную папку geoloc/.+
+
+3-2.3 Запустить скрипт/команды, чтобы загрузить и отобразить первые десять строк из файла 'geoloc/geolocation.csv' в каталог 'results-geoloc'(он будет создан автоматически, после выполнения скрипта) в редакторе Pig через Hue: Query > Editor > Pig:+
+
+Сначала убедиться в запуске Dataflow инструмента Oozie. На панели инструментов линк Oozie должен быть активным.+
+
+geoloc = LOAD 'geoloc/geolocation.csv' USING PigStorage(',') AS (truckid:chararray, 
+driverid:chararray, event:chararray, latitude:double, longitude:double, city:chararray, 
+state:chararray, velocity:double, event_ind:long, idling_ind:long);
+geoloc_limit = LIMIT geoloc 10;
+STORE geoloc_limit INTO 'results-geoloc'; 
+DUMP geoloc_limit;
+
+
+
+
